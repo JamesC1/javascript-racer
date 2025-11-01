@@ -61,18 +61,18 @@
       <th><label for="fogDensity">Fog Density (<span id="currentFogDensity"></span>) :</label></th>
       <td><input id="fogDensity" type='range' min='0' max='50' title="integer (0-50)"></td>
     </tr>
-
     <tr>
-      <th><label for="position" 
-                 class="radio-inline" >Controls position :</label></th>
-      <td id='positionContainer' style="font-size: large; text-align: center;">
-          &#x21A4; <input type="radio" name="position" value="left" checked/>
-          <input type="radio" name="position" value="right"/> &#x21A6;
+      <th><label for="position">Controls position :</label></th>
+      <td>
+        <select id="position" style="width:100%">
+          <option selected value='left'>Left</option>
+          <option value='right'>Right</option>
+        </select>
       </td>
     </tr>
 
   <tr>
-  <th colspan="2">
+  <th colspan="2" style="width:100%">
   <div id='instructions' style="width:90%; float:none; clear:none;">
     <p>Use the <b>arrow keys</b> to drive the car.</p>
   </div>
@@ -94,14 +94,14 @@
     </th>
   </table>
 
-  <div id="racer">
+  <div id="racer" style="position: static; z-index: auto">
     <div id="hud">
       <span id="speed"            class="hud"><span id="speed_value" class="value">0</span> mph</span>
       <span id="current_lap_time" class="hud">Time: <span id="current_lap_time_value" class="value">0.0</span></span> 
       <span id="last_lap_time"    class="hud">Last Lap: <span id="last_lap_time_value" class="value">0.0</span></span>
       <span id="fast_lap_time"    class="hud">Fastest Lap: <span id="fast_lap_time_value" class="value">0.0</span></span>
     </div>
-    <canvas id="canvas">
+    <canvas id="canvas" >
       Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
     </canvas>
     Loading...
@@ -691,10 +691,13 @@
       Dom.blur(ev);
     });
 
-    Dom.on('positionContainer', 'click', function(ev) {
+    Dom.on('position', 'change', function(ev) {
       controls=Dom.get("controls");
-      controls.style.float = ev.target.value;
-      controls.style.clear = ev.target.value;
+      controls.style.float = ev.target.options[ev.target.selectedIndex].value;
+      controls.style.clear = ev.target.options[ev.target.selectedIndex].value;
+//      racer.style.position = "relative";
+
+      console.log("Controls positon: "+ev.target.options[ev.target.selectedIndex].value + " in "+controls);
     });
 
     Dom.on('lanes',          'change', function(ev) { Dom.blur(ev); reset({ lanes:         ev.target.options[ev.target.selectedIndex].value }); });
