@@ -81,15 +81,15 @@
     <tr>
       <th style="width:100%" colspan="2">
         <table id="arrows" style="margin:0 auto">
-          <tr>
+          <tr id="arrows-top">
           <th id="arrow-ul">&#x2196;</th>
           <th id="arrow-up">&#x21a5;</th>
           <th id="arrow-ur">&#x2197;</th>
           </tr>
-          <tr>
-          <th id="arrow-r">&#x21A4;</th>
+          <tr id="arrows-bottom">
+          <th id="arrow-l">&#x21A4;</th>
           <th id="arrow-d">&#x21A7;</th>
-          <th id="arrow-l">&#x21A6;</th>
+          <th id="arrow-r">&#x21A6;</th>
           </tr>
         </table>
       </th>
@@ -171,6 +171,8 @@
     var keyRight       = false;
     var keyFaster      = false;
     var keySlower      = false;
+
+    var lastTouchArrowMethod = null;
 
     var hud = {
       speed:            { value: null, dom: Dom.get('speed_value')            },
@@ -684,6 +686,70 @@
     //=========================================================================
     // TWEAK UI HANDLERS
     //=========================================================================
+
+    function touchArrowChange(ev, isStart) {
+      var id = ev.target.id;
+
+      if (lastTouchArrowMethod) {
+        lastTouchArrowMethod.call(this,false);
+      }
+
+      if (!isStart) {
+        lastTouchArrowMethod=null;
+        return;
+      }
+
+      var arrows = [
+        { label: "arrow-ul", action: function(newState) {
+            keyFaster = newState; keyLeft = newState; }
+        },
+        { label: "arrow-up", action: function(newState) {
+            keyFaster = newState; }
+        },
+        { label: "arrow-ur", action: function(newState) {
+            keyFaster = newState; keyRight = newState; }
+        },
+        { label: "arrow-l", action: function() {
+            keyLeft = isStart; }
+        },
+        { label: "arrow-d", action: function() {
+            keySlower = isStart; }
+        },
+        { label: "arrow-r", action: function() {
+            keyRight = isStart; }
+        },
+        { label: "non-matching" }
+      ];
+
+      var n, a;
+
+      for (n=0; n < arrows.length; n++) {
+        a=arrows[n];
+        if (id == a.label) {
+          lastTouchArrowMethod=a.action;
+          lastTouchArrowMethod.call(this, true);
+        }
+      }
+    };
+
+    {
+      arrows=Dom.get("arrows");
+      rows=arrows.children[0].children;  // children of TBODY
+      for (let i = 0; i < rows.length; i++) {
+        row = rows[i];
+        arrows=row.children;
+        for (let j=0; j < arrows.length; j++) {
+          arrow=arrows[j];
+          id = arrow.id;
+          if (id)
+            Dom.on(arrow.id, 'mouseenter', 
+                   function(ev){touchArrowChange(ev, true);} );
+            Dom.on(arrow.id, 'mouseleave', 
+                   function(ev){touchArrowChange(ev, false);} );
+        }
+      }
+    }
+
 
     Dom.on('resolution', 'change', function(ev) {
       var w, h, ratio;
