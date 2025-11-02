@@ -745,7 +745,11 @@
           if (id)
             Dom.on(arrow.id, 'mouseenter', 
                    function(ev){touchArrowChange(ev, true);} );
+            Dom.on(arrow.id, 'touchstart', 
+                   function(ev){touchArrowChange(ev, true);} );
             Dom.on(arrow.id, 'mouseleave', 
+                   function(ev){touchArrowChange(ev, false);} );
+            Dom.on(arrow.id, 'touchend', 
                    function(ev){touchArrowChange(ev, false);} );
         }
       }
