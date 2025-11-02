@@ -9,7 +9,7 @@
 
 <body> 
 
-  <table id="controls">
+  <table id="controls" style="float:left">
     <tr>
       <td colspan="2">
         <a href='v1.straight.html'>straight</a> |
@@ -78,23 +78,30 @@
   </div>
   </th>
   </tr>
-    <th style="width:100%" colspan="2">
-      <table id="arrows" style="margin:0 auto" style="font-size: 50px;">
-        <tr>
-        <th>&#x2196;</th>
-        <th>&#x21a5;</th>
-        <th>&#x2197;</th>
-        </tr>
-        <tr>
-        <th>&#x21A4;</th>
-        <th>&#x21A7;</th>
-        <th>&#x21A6;</th>
-        </tr>
-      </table>
-    </th>
+    <tr>
+      <th style="width:100%" colspan="2">
+        <table id="arrows" style="margin:0 auto">
+          <tr>
+          <th id="arrow-ul">&#x2196;</th>
+          <th id="arrow-up">&#x21a5;</th>
+          <th id="arrow-ur">&#x2197;</th>
+          </tr>
+          <tr>
+          <th id="arrow-r">&#x21A4;</th>
+          <th id="arrow-d">&#x21A7;</th>
+          <th id="arrow-l">&#x21A6;</th>
+          </tr>
+        </table>
+      </th>
+    </tr>
+    <tr>
+      <td colspan=2 style="text-align: center">
+         <span id="mute" style="margin: 0;"></span>
+      </td>
+    </tr>
   </table>
 
-  <div id="racer">
+  <div id="racer" style="margin: 0 auto; z-index: auto; float: right">
     <div id="hud">
       <span id="speed"            class="hud"><span id="speed_value" class="value">0</span> mph</span>
       <span id="current_lap_time" class="hud">Time: <span id="current_lap_time_value" class="value">0.0</span></span> 
@@ -111,7 +118,6 @@
     <source src="music/racer.ogg">
     <source src="music/racer.mp3">
   </audio>
-  <span id="mute"></span>
 
   <script src="stats.js"></script>
   <script src="common.js"></script>
@@ -693,8 +699,10 @@
 
     Dom.on('positionContainer', 'click', function(ev) {
       controls=Dom.get("controls");
+      racer=Dom.get("racer");
+      otherSide=controls.style.float;
       controls.style.float = ev.target.value;
-      controls.style.clear = ev.target.value;
+      racer.style.float=otherSide;
     });
 
     Dom.on('lanes',          'change', function(ev) { Dom.blur(ev); reset({ lanes:         ev.target.options[ev.target.selectedIndex].value }); });
