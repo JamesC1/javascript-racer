@@ -687,6 +687,28 @@
     // TWEAK UI HANDLERS
     //=========================================================================
 
+    const touchArrowActions = [
+        { label: "arrow-ul", action: function(newState) {
+            keyFaster = newState; keyLeft = newState; }
+        },
+        { label: "arrow-up", action: function(newState) {
+            keyFaster = newState; }
+        },
+        { label: "arrow-ur", action: function(newState) {
+            keyFaster = newState; keyRight = newState; }
+        },
+        { label: "arrow-l", action: function(newState) {
+            keyLeft = newState; }
+        },
+        { label: "arrow-d", action: function(newState) {
+            keySlower = newState; }
+        },
+        { label: "arrow-r", action: function(newState) {
+            keyRight = newState; }
+        },
+        { label: "non-matching" }
+      ];
+
     function touchArrowChange(ev, isStart) {
       var id = ev.target.id;
 
@@ -699,28 +721,7 @@
         return;
       }
 
-      var arrows = [
-        { label: "arrow-ul", action: function(newState) {
-            keyFaster = newState; keyLeft = newState; }
-        },
-        { label: "arrow-up", action: function(newState) {
-            keyFaster = newState; }
-        },
-        { label: "arrow-ur", action: function(newState) {
-            keyFaster = newState; keyRight = newState; }
-        },
-        { label: "arrow-l", action: function() {
-            keyLeft = isStart; }
-        },
-        { label: "arrow-d", action: function() {
-            keySlower = isStart; }
-        },
-        { label: "arrow-r", action: function() {
-            keyRight = isStart; }
-        },
-        { label: "non-matching" }
-      ];
-
+      const arrows = touchArrowActions;
       var n, a;
 
       for (n=0; n < arrows.length; n++) {
