@@ -100,6 +100,11 @@
          <span id="mute" style="margin: 0;"></span>
       </td>
     </tr>
+    <tr>
+      <td colspan=2>
+        <div id="debugOut">
+      </td>
+    </tr>
   </table>
 
   <div id="racer" style="margin: 0 auto; z-index: auto; float: right">
@@ -712,6 +717,8 @@
 
     function touchArrowChange(ev, isStart) {
       var id = ev.target.id;
+      var debug = Dom.get("debugOut");
+      debug.innerHTML = "touchArrow: "+id+" x="+ev.offsetX+" y="+ev.offsetY;
 
       if (lastTouchArrowAction) {
         if (isStart && id == lastTouchArrowAction.label)
