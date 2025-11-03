@@ -718,7 +718,11 @@
     function touchArrowChange(ev, isStart) {
       var id = ev.target.id;
       var debug = Dom.get("debugOut");
-      debug.innerHTML = "touchArrow: "+id+" x="+ev.offsetX+" y="+ev.offsetY;
+      var location = ev;
+      if (location.touches && location.touches[0])
+        location=location.touches[0];
+      debug.innerHTML = "touchArrow: "+id+" x="+location.offsetX+
+                        " y="+location.offsetY;
 
       if (lastTouchArrowAction) {
         if (isStart && id == lastTouchArrowAction.label)
