@@ -78,7 +78,7 @@
   </div>
   </th>
   </tr>
-    <tr class="noselect"  ontouchstart="function(event)=event.preventDefault()">
+    <tr class="noselect"  ontouchstart="preventDefault(event)">
       <th style="width:100%" colspan="2">
         <table id="arrows" style="margin:0 auto">
           <tr id="arrows-top">
@@ -108,7 +108,7 @@
       <span id="last_lap_time"    class="hud">Last Lap: <span id="last_lap_time_value" class="value">0.0</span></span>
       <span id="fast_lap_time"    class="hud">Fastest Lap: <span id="fast_lap_time_value" class="value">0.0</span></span>
     </div>
-    <canvas id="canvas" ontouchstart="function(event)=event.preventDefault()">
+    <canvas id="canvas" ontouchstart="preventDefault(event)">
       Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
     </canvas>
     Loading...
