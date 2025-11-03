@@ -80,7 +80,8 @@
   </tr>
     <tr class="noselect">
       <th style="width:100%" colspan="2">
-        <table id="arrows" style="margin:0 auto">
+        <table id="arrows" style="margin:0 auto"
+                             ontouchstart="touchPreventDefault(event)">
           <tr id="arrows-top">
           <th id="arrow-ul">&#x2196;</th>
           <th id="arrow-up">&#x21a5;</th>
@@ -108,7 +109,7 @@
       <span id="last_lap_time"    class="hud">Last Lap: <span id="last_lap_time_value" class="value">0.0</span></span>
       <span id="fast_lap_time"    class="hud">Fastest Lap: <span id="fast_lap_time_value" class="value">0.0</span></span>
     </div>
-    <canvas id="canvas">
+    <canvas id="canvas" ontouchstart="touchPreventDefault(event)">
       Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
     </canvas>
     Loading...
@@ -759,6 +760,10 @@
                    function(ev){touchArrowChange(ev, false);} );
         }
       }
+    }
+
+    function touchPreventDefault(event) {
+      event.preventDefault();
     }
 
 
