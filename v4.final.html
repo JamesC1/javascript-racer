@@ -714,14 +714,14 @@
 
       if (lastTouchArrowAction) {
         if (isStart && id == lastTouchArrowAction.label)
-          return;   // fast path for touchmove events
+          return false;   // fast path for touchmove events
 
         lastTouchArrowAction.action.call(this,false);
       }
 
       if (!isStart) {
         lastTouchArrowAction=null;
-        return;
+        return false;
       }
 
       const arrows = touchArrowActions;
@@ -734,6 +734,7 @@
           lastTouchArrowAction.action.call(this, true);
         }
       }
+      return false;
     };
 
     {
