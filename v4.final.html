@@ -172,7 +172,7 @@
     var keyFaster      = false;
     var keySlower      = false;
 
-    var lastTouchArrowMethod = null;
+    var lastTouchArrowAction = null;
 
     var hud = {
       speed:            { value: null, dom: Dom.get('speed_value')            },
@@ -712,12 +712,15 @@
     function touchArrowChange(ev, isStart) {
       var id = ev.target.id;
 
-      if (lastTouchArrowMethod) {
-        lastTouchArrowMethod.call(this,false);
+      if (lastTouchArrowAction) {
+        if (isStart && id == lastTouchArrowAction.label)
+          return;   // fast path for touchmove events
+
+        lastTouchArrowAction.action.call(this,false);
       }
 
       if (!isStart) {
-        lastTouchArrowMethod=null;
+        lastTouchArrowAction=null;
         return;
       }
 
@@ -727,8 +730,8 @@
       for (n=0; n < arrows.length; n++) {
         a=arrows[n];
         if (id == a.label) {
-          lastTouchArrowMethod=a.action;
-          lastTouchArrowMethod.call(this, true);
+          lastTouchArrowAction=a;
+          lastTouchArrowAction.action.call(this, true);
         }
       }
     };
@@ -746,6 +749,8 @@
             Dom.on(arrow.id, 'mouseenter', 
                    function(ev){touchArrowChange(ev, true);} );
             Dom.on(arrow.id, 'touchstart', 
+                   function(ev){touchArrowChange(ev, true);} );
+            Dom.on(arrow.id, 'touchmove', 
                    function(ev){touchArrowChange(ev, true);} );
             Dom.on(arrow.id, 'mouseleave', 
                    function(ev){touchArrowChange(ev, false);} );
