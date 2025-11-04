@@ -103,7 +103,7 @@
     <tr>
       <td colspan=2>
         <div id="debugOut">
-With the two versions of location in touchActions.
+With minimal debugging on canvas.
         </div>
       </td>
     </tr>
@@ -116,7 +116,7 @@ With the two versions of location in touchActions.
       <span id="last_lap_time"    class="hud">Last Lap: <span id="last_lap_time_value" class="value">0.0</span></span>
       <span id="fast_lap_time"    class="hud">Fastest Lap: <span id="fast_lap_time_value" class="value">0.0</span></span>
     </div>
-    <canvas id="canvas" ontouchstart="touchPreventDefault(event)">
+    <canvas id="canvas" ontouchmove="minimalTouchMove(event)">
       Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
     </canvas>
     Loading...
@@ -775,8 +775,13 @@ With the two versions of location in touchActions.
       }
     }
 
-    function touchPreventDefault(event) {
+    function minimalTouchMove(event) {
       event.preventDefault();
+      var debug = Dom.get("debugOut");
+      debug.innerHTML = "Ran minimalTouchMove";
+      var location = event.touches[0];
+      debug.innerHTML = "minimalTouchMove: got a touch";
+      debug.innerHTML = "minimalTouchMove: x="+location.clientX+" y="+location.clientY;
     }
 
 
