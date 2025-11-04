@@ -7,7 +7,10 @@
   <link href="common.css" rel="stylesheet" type="text/css" />
 </head> 
 
-<body> 
+<body
+  onresize="touchArrowReconfigure()"
+  onload="touchArrowReconfigure()"
+  >
 
   <table id="controls" style="float:left">
     <tr>
@@ -103,7 +106,7 @@
     <tr>
       <td colspan=2>
         <div id="debugOut">
-Getting coordinates; try for context.
+Turning coordinates into driving, v1.
         </div>
       </td>
     </tr>
@@ -116,7 +119,15 @@ Getting coordinates; try for context.
       <span id="last_lap_time"    class="hud">Last Lap: <span id="last_lap_time_value" class="value">0.0</span></span>
       <span id="fast_lap_time"    class="hud">Fastest Lap: <span id="fast_lap_time_value" class="value">0.0</span></span>
     </div>
-    <canvas id="canvas" ontouchmove="minimalTouchMove(event)">
+    <canvas id="canvas"
+            ontouchstart="touchArrowEvent(event)"
+            ontouchmove="touchArrowEvent(event)"
+            ontouchend="touchArrowEnd()"
+            ontouchcancel="touchArrowEnd()"
+            onmouseenter="touchArrowEvent(event)"
+            onmousemove="touchArrowEvent(event)"
+            onmouseleave="touchArrowEnd()"
+    >
       Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
     </canvas>
     Loading...
@@ -181,6 +192,11 @@ Getting coordinates; try for context.
     var keySlower      = false;
 
     var lastTouchArrowAction = null;
+
+    var touchOffsetX;
+    var touchScaleX;
+    var touchOffsetY;
+    var touchScaleY;
 
     var hud = {
       speed:            { value: null, dom: Dom.get('speed_value')            },
@@ -695,7 +711,7 @@ Getting coordinates; try for context.
     // TWEAK UI HANDLERS
     //=========================================================================
 
-    const touchArrowActions = [
+    const touchArrowActions = [[
         { label: "arrow-ul", action: function(newState) {
             keyFaster = newState; keyLeft = newState; }
         },
@@ -705,6 +721,7 @@ Getting coordinates; try for context.
         { label: "arrow-ur", action: function(newState) {
             keyFaster = newState; keyRight = newState; }
         },
+        ],[
         { label: "arrow-l", action: function(newState) {
             keyLeft = newState; }
         },
@@ -714,8 +731,57 @@ Getting coordinates; try for context.
         { label: "arrow-r", action: function(newState) {
             keyRight = newState; }
         },
-        { label: "non-matching" }
-      ];
+      ]];
+
+    function touchArrowEnd() {
+      if (lastTouchArrowAction) {
+        lastTouchArrowAction.action.call(this,false);
+        lastTouchArrowAction = null;
+      }
+    }
+
+    function touchArrowReconfigure(event) {
+      // Ok, we need to fit 3-wide by 2-high of virtual buttons
+      // somewhere around the car, which I don't know how to measure,
+      // so I'm going to assume that, in total, it's about 25% both ways,
+      // bottom-centre in the canvas.
+      var canvas = Dom.get("racer");
+      var canvX = canvas.scrollWidth;
+      var canvY = canvas.scrollHeight;
+
+      const xProp=0.25;
+      const yProp=0.25;
+
+      touchOffsetX = Math.floor((0.5 - xProp/2.0)*canvX);
+      touchScaleX  = canvX * (xProp) / 3.0;
+      touchOffsetY = Math.floor(canvY * (1.0 - yProp));
+      touchScaleY  = canvY * (yProp) / 2.0;
+
+      var debug = Dom.get("debugOut");
+      debug.innerHTML = "touch reconfigure: "+canvX+"/"+canvY + " => " +
+                         "--"+touchOffsetX+"*"+touchScaleX+ " / "+
+                         "--"+touchOffsetY+"*"+touchScaleY;
+    }
+
+    function touchArrowEvent(event) {
+      event.preventDefault();
+
+      var indexX = Math.floor((event.layerX - touchOffsetX)/touchScaleX);
+      var indexY = Math.floor((event.layerY - touchOffsetY)/touchScaleY);
+
+      var debug = Dom.get("debugOut");
+      debug.innerHTML = "touch: "+event.class+ " "+indexX+"/"+indexY;
+
+      if (indexX < 0 || indexY < 0 || indexX >=3 || indexY >=2) {
+        touchArrowEnd();
+        return;
+      }
+
+      lastTouchArrowAction = touchArrowActions[indexY][indexX];
+      lastTouchArrowAction.action.call(this, true);
+      debug.innerHTML = "touch: "+event.class+ " "+indexX+"/"+indexY+" in "+
+                        lastTouchArrowAction.label;
+    }
 
     function touchArrowChange(ev, isStart) {
       var id = ev.target.id;
@@ -730,27 +796,31 @@ Getting coordinates; try for context.
 
       if (lastTouchArrowAction) {
         if (isStart && id == lastTouchArrowAction.label)
-          return false;   // fast path for touchmove events
+          return;   // fast path for touchmove events
 
         lastTouchArrowAction.action.call(this,false);
       }
 
       if (!isStart) {
         lastTouchArrowAction=null;
-        return false;
+        return;
       }
 
       const arrows = touchArrowActions;
-      var n, a;
 
-      for (n=0; n < arrows.length; n++) {
-        a=arrows[n];
-        if (id == a.label) {
-          lastTouchArrowAction=a;
-          lastTouchArrowAction.action.call(this, true);
+      var a;
+
+      for (let i=0; i < arrows.length; i++) {
+        var subset = arrows[i];
+        for (let j=0; j<subset.length; j++) {
+          a=subset[j];
+
+          if (id == a.label) {
+            lastTouchArrowAction=a;
+            lastTouchArrowAction.action.call(this, true);
+          }
         }
       }
-      return false;
     };
 
     {
