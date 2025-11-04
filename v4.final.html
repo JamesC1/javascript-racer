@@ -103,7 +103,7 @@
     <tr>
       <td colspan=2>
         <div id="debugOut">
-With minimal debugging on canvas.
+Debugging offset X/Y on canvas.
         </div>
       </td>
     </tr>
@@ -781,7 +781,7 @@ With minimal debugging on canvas.
       debug.innerHTML = "Ran minimalTouchMove";
       var location = event.touches[0];
       debug.innerHTML = "minimalTouchMove: got a touch";
-      debug.innerHTML = "minimalTouchMove: x="+location.clientX+" y="+location.clientY;
+      debug.innerHTML = "minimalTouchMove: x="+location.offsetX+" y="+location.offsetY;
     }
 
 
