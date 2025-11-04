@@ -103,7 +103,7 @@
     <tr>
       <td colspan=2>
         <div id="debugOut">
-Debugging layer X/Y on canvas and reporting target.
+Multitouches exist, but don't have layer information.
         </div>
       </td>
     </tr>
@@ -779,9 +779,8 @@ Debugging layer X/Y on canvas and reporting target.
       event.preventDefault();
       var debug = Dom.get("debugOut");
       debug.innerHTML = "Ran minimalTouchMove";
-      var location = event.touches[0];
       debug.innerHTML = "minimalTouchMove: got a touch";
-      debug.innerHTML = "minimalTouchMove: x="+location.layerX+" y="+location.layerY+" in "+event.target.id;
+      debug.innerHTML = "minimalTouchMove: x="+event.layerX+" y="+event.layerY+" in "+event.target.id;
     }
 
 
