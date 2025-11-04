@@ -103,7 +103,7 @@
     <tr>
       <td colspan=2>
         <div id="debugOut">
-Debugging offset X/Y on canvas.
+Debugging layer X/Y on canvas and reporting target.
         </div>
       </td>
     </tr>
@@ -724,7 +724,7 @@ Debugging offset X/Y on canvas.
       if (location.touches && location.touches[0])
         location=location.touches[0];
       debug.innerHTML = "touchArrow: "+id+" x="+location.offsetX+
-                        " y="+location.offsetY;
+                        " y="+location.offsetY+" in "+ev.target.id;
 
       if (lastTouchArrowAction) {
         if (isStart && id == lastTouchArrowAction.label)
@@ -781,7 +781,7 @@ Debugging offset X/Y on canvas.
       debug.innerHTML = "Ran minimalTouchMove";
       var location = event.touches[0];
       debug.innerHTML = "minimalTouchMove: got a touch";
-      debug.innerHTML = "minimalTouchMove: x="+location.offsetX+" y="+location.offsetY;
+      debug.innerHTML = "minimalTouchMove: x="+location.layerX+" y="+location.layerY+" in "+event.target.id;
     }
 
 
