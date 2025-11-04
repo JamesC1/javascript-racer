@@ -103,7 +103,7 @@
     <tr>
       <td colspan=2>
         <div id="debugOut">
-Multitouches exist, but don't have layer information.
+Getting coordinates; try for context.
         </div>
       </td>
     </tr>
@@ -721,10 +721,12 @@ Multitouches exist, but don't have layer information.
       var id = ev.target.id;
       var debug = Dom.get("debugOut");
       var location = ev;
+      var target = ev.target;
       if (location.touches && location.touches[0])
         location=location.touches[0];
       debug.innerHTML = "touchArrow: "+id+" x="+location.offsetX+
-                        " y="+location.offsetY+" in "+ev.target.id;
+                        " y="+location.offsetY+" in "+ev.target.id+
+                        " with x/y=" +target.width +"/"+target.height;
 
       if (lastTouchArrowAction) {
         if (isStart && id == lastTouchArrowAction.label)
@@ -780,7 +782,8 @@ Multitouches exist, but don't have layer information.
       var debug = Dom.get("debugOut");
       debug.innerHTML = "Ran minimalTouchMove";
       debug.innerHTML = "minimalTouchMove: got a touch";
-      debug.innerHTML = "minimalTouchMove: x="+event.layerX+" y="+event.layerY+" in "+event.target.id;
+      var target = event.target;
+      debug.innerHTML = "minimalTouchMove: x="+event.layerX+" y="+event.layerY+" in "+target.id+" with X/Y="+ target.scrollWidth +"/"+target.scrollHeight;
     }
 
 
