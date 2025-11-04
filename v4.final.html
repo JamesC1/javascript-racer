@@ -106,7 +106,6 @@
     <tr>
       <td colspan=2>
         <div id="debugOut">
-Turning coordinates into driving, v1.
         </div>
       </td>
     </tr>
@@ -756,11 +755,12 @@ Turning coordinates into driving, v1.
       touchScaleX  = canvX * (xProp) / 3.0;
       touchOffsetY = Math.floor(canvY * (1.0 - yProp));
       touchScaleY  = canvY * (yProp) / 2.0;
-
+/*
       var debug = Dom.get("debugOut");
       debug.innerHTML = "touch reconfigure: "+canvX+"/"+canvY + " => " +
                          "--"+touchOffsetX+"*"+touchScaleX+ " / "+
                          "--"+touchOffsetY+"*"+touchScaleY;
+*/
     }
 
     function touchArrowEvent(event) {
@@ -769,8 +769,10 @@ Turning coordinates into driving, v1.
       var indexX = Math.floor((event.layerX - touchOffsetX)/touchScaleX);
       var indexY = Math.floor((event.layerY - touchOffsetY)/touchScaleY);
 
+/*
       var debug = Dom.get("debugOut");
       debug.innerHTML = "touch: "+event.class+ " "+indexX+"/"+indexY;
+*/
 
       if (indexX < 0 || indexY < 0 || indexX >=3 || indexY >=2) {
         touchArrowEnd();
@@ -779,20 +781,24 @@ Turning coordinates into driving, v1.
 
       lastTouchArrowAction = touchArrowActions[indexY][indexX];
       lastTouchArrowAction.action.call(this, true);
+/*
       debug.innerHTML = "touch: "+event.class+ " "+indexX+"/"+indexY+" in "+
                         lastTouchArrowAction.label;
+*/
     }
 
     function touchArrowChange(ev, isStart) {
       var id = ev.target.id;
-      var debug = Dom.get("debugOut");
       var location = ev;
       var target = ev.target;
       if (location.touches && location.touches[0])
         location=location.touches[0];
+/*
+      var debug = Dom.get("debugOut");
       debug.innerHTML = "touchArrow: "+id+" x="+location.offsetX+
                         " y="+location.offsetY+" in "+ev.target.id+
                         " with x/y=" +target.width +"/"+target.height;
+*/
 
       if (lastTouchArrowAction) {
         if (isStart && id == lastTouchArrowAction.label)
@@ -846,16 +852,6 @@ Turning coordinates into driving, v1.
         }
       }
     }
-
-    function minimalTouchMove(event) {
-      event.preventDefault();
-      var debug = Dom.get("debugOut");
-      debug.innerHTML = "Ran minimalTouchMove";
-      debug.innerHTML = "minimalTouchMove: got a touch";
-      var target = event.target;
-      debug.innerHTML = "minimalTouchMove: x="+event.layerX+" y="+event.layerY+" in "+target.id+" with X/Y="+ target.scrollWidth +"/"+target.scrollHeight;
-    }
-
 
     Dom.on('resolution', 'change', function(ev) {
       var w, h, ratio;
