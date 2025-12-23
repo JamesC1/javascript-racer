@@ -749,11 +749,11 @@
       // It must also prevent stray scrolling of the canvas.
 
       if (event && event.layerY  < touchBoundaryY) {
-        event.preventDefault();
-      }else{
-        nextTouchAction = event;
-//        console.log({lx:event.layerX, ly:event.layerY, cx:event.clientX, cy:event.clientY});
+        return;
       }
+      event.preventDefault();
+      nextTouchAction = event;
+//    console.log({lx:event.layerX, ly:event.layerY, cx:event.clientX, cy:event.clientY});
     }
 
     function touchActionReconfigure(event) {
