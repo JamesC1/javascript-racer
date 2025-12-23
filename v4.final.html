@@ -8,8 +8,8 @@
 </head> 
 
 <body
-  onresize="touchArrowReconfigure()"
-  onload="touchArrowReconfigure()"
+  onresize="touchActionReconfigure()"
+  onload="touchActionReconfigure()"
   >
 
   <table id="controls" style="float:left">
@@ -77,7 +77,7 @@
   <tr>
   <th colspan="2">
   <div id='instructions' style="width:90%; float:none; clear:none;">
-    <p>Use the <b>arrow keys</b> to drive the car.</p>
+    <p>Use the <b>arrow keys</b> or touch the car to drive.</p>
   </div>
   </th>
   </tr>
@@ -119,13 +119,13 @@
       <span id="fast_lap_time"    class="hud">Fastest Lap: <span id="fast_lap_time_value" class="value">0.0</span></span>
     </div>
     <canvas id="canvas"
-            ontouchstart="touchArrowEvent(event)"
-            ontouchmove="touchArrowEvent(event)"
-            ontouchend="touchArrowEnd()"
-            ontouchcancel="touchArrowEnd()"
-            onmouseenter="touchArrowEvent(event)"
-            onmousemove="touchArrowEvent(event)"
-            onmouseleave="touchArrowEnd()"
+            ontouchstart="touchActionRecord(event)"
+            ontouchmove="touchActionRecord(event)"
+            ontouchend="touchActionRecord(null)"
+            ontouchcancel="touchActionRecord(null)"
+            onmouseenter="touchActionRecord(event)"
+            onmousemove="touchActionRecord(event)"
+            onmouseleave="touchActionRecord(null)"
     >
       Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
     </canvas>
@@ -190,12 +190,19 @@
     var keyFaster      = false;
     var keySlower      = false;
 
-    var lastTouchArrowAction = null;
+    var lastTouchAction = null;  // what to cancel when something changes
+    var nextTouchAction = undefined;
+        // WARNING: this code turns on the difference between
+        // null and undefined, so some tests will behave apropriately
+        // only with ===.
+        // Null means that the action has finished.
+        // Undefined means that there is no change.
 
     var touchOffsetX;
     var touchScaleX;
     var touchOffsetY;
     var touchScaleY;
+    var touchBoundaryY;
 
     var hud = {
       speed:            { value: null, dom: Dom.get('speed_value')            },
@@ -216,6 +223,8 @@
       var speedPercent  = speed/maxSpeed;
       var dx            = dt * 2 * speedPercent; // at top speed, should be able to cross from left to right (-1 to 1) in 1 second
       var startPosition = position;
+
+      touchActionDeploy();
 
       updateCars(dt, playerSegment, playerW);
 
@@ -732,14 +741,22 @@
         },
       ]];
 
-    function touchArrowEnd() {
-      if (lastTouchArrowAction) {
-        lastTouchArrowAction.action.call(this,false);
-        lastTouchArrowAction = null;
+    function touchActionRecord(event) {
+      // This happen ever time the UI detects a mouse move.
+      // It must be minimal and, especially,
+      // generate as little garbage as possible. 
+      //
+      // It must also prevent stray scrolling of the canvas.
+
+      if (event && event.layerY  < touchBoundaryY) {
+        event.preventDefault();
+      }else{
+        nextTouchAction = event;
+//        console.log({lx:event.layerX, ly:event.layerY, cx:event.clientX, cy:event.clientY});
       }
     }
 
-    function touchArrowReconfigure(event) {
+    function touchActionReconfigure(event) {
       // Ok, we need to fit 3-wide by 2-high of virtual buttons
       // somewhere around the car, which I don't know how to measure,
       // so I'm going to assume that, in total, it's about 25% both ways,
@@ -755,6 +772,7 @@
       touchScaleX  = canvX * (xProp) / 3.0;
       touchOffsetY = Math.floor(canvY * (1.0 - yProp));
       touchScaleY  = canvY * (yProp) / 2.0;
+      touchBoundaryY = canvY / 4;
 /*
       var debug = Dom.get("debugOut");
       debug.innerHTML = "touch reconfigure: "+canvX+"/"+canvY + " => " +
@@ -763,24 +781,39 @@
 */
     }
 
-    function touchArrowEvent(event) {
-      event.preventDefault();
+    function touchActionDeploy() {
+      // This is all of the slow stuff, that now happens once per update.
 
+      if (undefined === nextTouchAction)
+        return;
+
+      if (lastTouchAction) {
+        lastTouchAction.action.call(this, false);
+        lastTouchAction = null;   // in case we return early
+      }
+
+      var event=nextTouchAction;
+      nextTouchAction=undefined;
+
+      if (null === event)
+        // We've already cancelled the previous action.
+        return;
+      
       var indexX = Math.floor((event.layerX - touchOffsetX)/touchScaleX);
       var indexY = Math.floor((event.layerY - touchOffsetY)/touchScaleY);
 
+//      console.log({indexX, indexY, lx:event.layerX, ly:event.layerY, cx:event.clientX, cy:event.clientY});
 /*
       var debug = Dom.get("debugOut");
       debug.innerHTML = "touch: "+event.class+ " "+indexX+"/"+indexY;
 */
 
       if (indexX < 0 || indexY < 0 || indexX >=3 || indexY >=2) {
-        touchArrowEnd();
         return;
       }
 
-      lastTouchArrowAction = touchArrowActions[indexY][indexX];
-      lastTouchArrowAction.action.call(this, true);
+      lastTouchAction = touchArrowActions[indexY][indexX];
+      lastTouchAction.action.call(this, true);
 /*
       debug.innerHTML = "touch: "+event.class+ " "+indexX+"/"+indexY+" in "+
                         lastTouchArrowAction.label;
@@ -788,9 +821,14 @@
     }
 
     function touchArrowChange(ev, isStart) {
+      // Specifically related to the grid of synthetic arrows
+      // that might go away.
       var id = ev.target.id;
       var location = ev;
       var target = ev.target;
+
+      ev.preventDefault();
+
       if (location.touches && location.touches[0])
         location=location.touches[0];
 /*
@@ -800,15 +838,15 @@
                         " with x/y=" +target.width +"/"+target.height;
 */
 
-      if (lastTouchArrowAction) {
-        if (isStart && id == lastTouchArrowAction.label)
+      if (lastTouchAction) {
+        if (isStart && id == lastTouchAction.label)
           return;   // fast path for touchmove events
 
-        lastTouchArrowAction.action.call(this,false);
+        lastTouchAction.action.call(this,false);
       }
 
       if (!isStart) {
-        lastTouchArrowAction=null;
+        lastTouchAction=null;
         return;
       }
 
@@ -822,8 +860,8 @@
           a=subset[j];
 
           if (id == a.label) {
-            lastTouchArrowAction=a;
-            lastTouchArrowAction.action.call(this, true);
+            lastTouchAction=a;
+            lastTouchAction.action.call(this, true);
           }
         }
       }
